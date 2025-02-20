@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Tour Costs</title>
+  </head>
+  <body>
+    <div class="container">
+    <h1>Tour Costs</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('add_tour') }}">
+      <div class="form-group">
+        <label for="tour_name">Tour name:</label>
+        <input id="tour_name" name="tour_name" class="form-control" aria-describedby="tour_name_help" placeholder="London Pub Tour..." />
+        <small id="tour_name_help" class="form-text text-muted">E.g. London Pub Tour</small>
+
+      </div>
+
+      
+			<div class="form-row">
+      <h4>Fixed costs per person</h4>
+			</div>
+			<div class="form-row">
+			<p>Add any fixed-costs per person.</p>
+			</div>
+			<div class="form-row can-duplicate" data-form-control-collection-name="fixed_person_cost_form_controls">
+				<div class="form-group col-md-6">
+					<label for="fixed_per_person_cost_name">Name of fixed per-person cost</label>
+					<input type="text" class="form-control" name="fixed_per_person_cost_name" placeholder="Zoo entrance...">
+				</div>
+				<div class="form-group col-md-6">
+					<label for="fixed_per_person_cost_amount">Amount</label>
+					<input type="text" class="form-control" name="fixed_per_person_cost_amount" placeholder="65">
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group col-md-12 mt-auto">
+					<button type="button" class="btn btn-secondary add-another-form-btn" id="add-another-fixed-per-person-cost">Add another fixed per-person cost</button>
+					<button type="button" class="btn btn-warning remove-last-add-another">Remove last added</button>
+				</div>
+			</div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </div><!-- end container -->
+    <script>
+    function duplicateFormControls() {
+
+        let target = document.querySelectorAll(".can-duplicate")[document.querySelectorAll(".can-duplicate").length - 1];
+        
+        let cloned = target.cloneNode(true);
+        target.insertAdjacentElement('afterend', cloned);
+
+    }
+
+    function removeLastAddedDuplicatedFormControl(e) {
+      console.log(`in removeLastAddedDuplicatedFormControl. Event target was ${e.target}`);
+      let deletionTarget = e.target.parentElement.parentElement.previousElementSibling;
+
+      // Check we're not at the last item (refuse to remove if last element
+      // so that duplication can happen still
+      let formControlCollectionName = deletionTarget.dataset.formControlCollectionName
+      if (document.querySelectorAll(`[data-form-control-collection-name=${formControlCollectionName}]`).length == 1 ) {
+          console.log("Refusing to remove last form control group");
+      } else {
+        deletionTarget.remove();
+      }
+    }
+
+
+    // Add another form element(s) event listener
+    document.querySelectorAll(".add-another-form-btn").forEach(function(currentValue, currentIndex, listObj) {
+     console.log(`${currentValue}, ${currentIndex}, ${this}`);
+     
+     currentValue.addEventListener('click', function() {
+        console.log("Clicked it");
+        duplicateFormControls();
+     });
+    });
+    // End Add another form element(s) event listener
+
+    // Remove last added duplicated form element(s) event listener
+    document.querySelectorAll(".remove-last-add-another").forEach(function(currentValue, currentIndex, listObj) {
+     console.log(`${currentValue}, ${currentIndex}, ${this}`);
+     currentValue.addEventListener('click', function(e) {
+        console.log("Clicked it");
+        removeLastAddedDuplicatedFormControl(e);
+     });
+
+    });
+
+    </script>
+  </body>
+</html>
