@@ -1,5 +1,7 @@
-from flask import Flask, render_template, flash, request
+from flask import Flask, render_template, flash, request, redirect, url_for, jsonify
 import secrets
+import json
+import pickle
 
 """
 
@@ -32,13 +34,10 @@ tour = {
 def calculate_cost_per_person(tour, number_of_people):
     total_cost = 0
     fixed_costs = 0
-    # Honour the max/min people allowed on a tour
-    assert number_of_people <= tour["pricing_rules"]["max_people"]
-    assert number_of_people >= tour["pricing_rules"]["min_people"]
 
     # Calculate the fixed costs
     for fixed_cost in tour["pricing_rules"]["fix_costs_per_person"]:
-        fixed_costs += fixed_cost["amount"]
+        fixed_costs += int(fixed_cost["amount"])
         print(
             f"Adding fixed_cost {fixed_cost['name']}: £{fixed_cost['amount']}"
         )  # noqa: E501
@@ -73,24 +72,100 @@ def calculate_cost_per_person(tour, number_of_people):
 app = Flask(__name__)
 app.secret_key = secrets.token_hex()
 
+# Load previously pickled tours if present
+try:
+    fp = open("tours-pickle", mode="rb")
+    tours = pickle.load(fp)
+    tours = json.loads(tours)
+except (FileNotFoundError, EOFError):
+    print("picke file is FileNotFoundError or EOFError. Writing empty tours list")
+    with open("tours-pickle", mode="wb") as fp:
+        stub = json.dumps([])
+        pickle.dump(stub, fp)
+except Exception as e:
+    print(f"Error pickle {e}")
+
+
+def save_tours_to_pickle_file(tours):
+    # TODO assure structure
+    with open("tours-pickle", mode="wb") as fp:
+        pickle.dump(json.dumps(tours), fp)
+
 
 @app.route("/")
 def index():
     return render_template("admin.html")
 
 
+@app.route("/tours")
+def list_tours():
+    return render_template("list-tours.html", tours=tours)
+
+
 @app.route("/api/tour", methods=["POST"])
 def add_tour():
     # Get tour name
     tour_name = request.form.get("tour_name")
+    tour_code = request.form.get("tour_code")
+    min_people = request.form.get("min_people")
+    max_people = request.form.get("max_people")
+
     # Get fixed costs per person
-    for fixed_per_person_cost_name in request.form.getlist(
+    fixed_per_person_cost_names = request.form.getlist(
         "fixed_per_person_cost_name"
-    ):
-        print(fixed_per_person_cost_name)
-    for fixed_per_person_cost_amount in request.form.getlist(
+    )  # noqa: E501
+    fixed_per_person_cost_amounts = request.form.getlist(
         "fixed_per_person_cost_amount"
-    ):
-        print(fixed_per_person_cost_amount)
+    )  # noqa: E501
+
+    fix_costs_per_person = dict(
+        zip(fixed_per_person_cost_names, fixed_per_person_cost_amounts)
+    )
+    print(f"fix_costs_per_person are {fix_costs_per_person}")
+
+    fix_costs_per_person = [
+        {"name": fixed_pp_cost_name, "amount": fixed_pp_cost_amount}
+        for fixed_pp_cost_name, fixed_pp_cost_amount in zip(
+            fixed_per_person_cost_names, fixed_per_person_cost_amounts
+        )
+    ]
+
+    # Get prices per person group size ranges
+    min_people_group_size_prices = request.form.getlist(
+        "min_people_group_size_price"
+    )  # noqa: E501
+
+    max_people_group_size_prices = request.form.getlist(
+        "max_people_group_size_price"
+    )  # noqa: E501
+
+    group_size_price_per_persons = request.form.getlist(
+        "group_size_price_per_person"
+    )  # noqa: E501
+
+    # Combind min/max/price_per_person into structure desired for calculation
+    price_per_person_based_on_size_of_group = [
+        {"min": int(min_p), "max": int(max_p), "price_per_person": int(price)}
+        for min_p, max_p, price in zip(
+            min_people_group_size_prices,
+            max_people_group_size_prices,
+            group_size_price_per_persons,
+        )
+    ]
+
+    # Build valid tour object
+    tour = {
+        "name": tour_name,
+        "pricing_rules": {
+            "max_people": int(max_people),
+            "min_people": int(min_people),
+            "fix_costs_per_person": fix_costs_per_person,
+            "price_per_person_based_on_size_of_group": price_per_person_based_on_size_of_group,
+        },
+    }
+
+    tours.append(tour)
+    save_tours_to_pickle_file(tours)
+
     flash(f"Tour added: {tour_name}")
-    return render_template("admin.html")
+    return redirect(url_for("list_tours"))
