@@ -169,3 +169,7 @@ def add_tour():
 
     flash(f"Tour added: {tour_name}")
     return redirect(url_for("list_tours"))
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5008)
