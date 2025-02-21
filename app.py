@@ -82,6 +82,10 @@ except (FileNotFoundError, EOFError):
     with open("tours-pickle", mode="wb") as fp:
         stub = json.dumps([])
         pickle.dump(stub, fp)
+    fp = open("tours-pickle", mode="rb")
+    # Load newly created empty tours object
+    tours = pickle.load(fp)
+    tours = json.loads(tours)
 except Exception as e:
     print(f"Error pickle {e}")
 
