@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {% block head %}
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+    <!-- Bootstrap overrides -->
+    .form-control {
+        color: #fff;
+    }
+    </style>
+
+    <title>{% block title %}{% endblock %} - My Webpage</title>
+    {% endblock head %}
+</head>
+
+<body>
+    <div class="container">
+
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Add Tours</a></li>
+                <li><a href="{{ url_for('list_tours') }}">Edit Tours</a></li>
+            </ul>
+        </nav>
+
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div><!-- end container -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script>
+        function duplicateFormControls(e) {
+            console.log(e);
+            //let target = document.querySelectorAll(".can-duplicate")[document.querySelectorAll(".can-duplicate").length - 1];
+            let target = e.target.parentElement.parentElement.previousElementSibling;
+            let formControlsTemplate = document.querySelector(`[data-form-control-collection-template=${e.target.dataset.targetFormControlCollectionTemplateName}]`);
+
+            let formControlCollectionName = formControlsTemplate.dataset.formControlCollectionName;
+            let formControlCollectionCount = document.getElementById(`${formControlCollectionName}_count`);
+            console.log(`formControlCollectionCount is ${formControlCollectionCount.value}`);
+
+            if (formControlCollectionCount.value == 0) {
+                formControlCollectionCount.value = 1;
+            } else {
+                formControlCollectionCount.value++;
+            }
+
+            console.log(`formControlCollectionCount is now ${formControlCollectionCount.value}`);
+
+            let newCount = formControlCollectionCount.value - 1;
+
+            let cloned = formControlsTemplate.cloneNode(true);
+            console.log(`Marking cloned node as no longer hidden`);
+            cloned.hidden = false;
+            console.log("Setting cloned form control input elements to empty by default");
+            cloned.querySelectorAll("input").forEach(function (elm) {
+                console.log("Updating the cloned form control value, name & id");
+                elm.value = '';
+                elm.required = true;
+                elm.name = elm.name.split("-")[0] + "-" + newCount;
+                elm.id = elm.name.split("-")[0] + "-" + newCount;
+                console.log("Duplicated input as:");
+                console.log(elm);
+                console.log("Set input label for attribute index correctly");
+                targetLabelTag = elm.previousElementSibling;
+                if (elm.previousElementSibling.tagName != "LABEL") {
+                    console.log("Looking node higher for label element");
+                    targetLabelTag = elm.parentElement.previousElementSibling;
+                }
+                targetLabelTag.setAttribute("for", targetLabelTag.getAttribute("for").split("-")[0] + "-" + newCount);
+
+                if (elm.getAttribute("aria-describedby") != null) {
+                    console.log("Setting aria-describedby index");
+                    elm.setAttribute("aria-describedby", elm.getAttribute("aria-describedby").split("-")[0] + "-" + newCount);
+                }
+            });
+
+            target.insertAdjacentElement('afterend', cloned);
+            console.log(`Updated formControlCollectionCount for ${formControlCollectionName} to ${formControlCollectionCount.value}`);
+            console.log("Enable 'remove last added' button if disabled");
+            e.target.nextElementSibling.disabled = false;
+        }
+
+        function removeLastAddedDuplicatedFormControl(e) {
+            console.log(`in removeLastAddedDuplicatedFormControl. Event target was ${e.target}`);
+            let deletionTarget = e.target.parentElement.parentElement.previousElementSibling;
+
+            // Check we're not at the last item (refuse to remove if last element
+            // so that duplication can happen still
+            let formControlCollectionName = deletionTarget.dataset.formControlCollectionName
+
+            // TODO USE THIS
+            let target_form_control_template = document.querySelectorAll(`[data-form-control-collection-template="${deletionTarget.dataset.formControlCollectionName
+                }"]`);
+            // END TODO
+
+            if (price_per_person_group_size_form_controls_count.value == 0) {
+                console.log(`Refusing to remove further form-controls because price_per_person_group_size_form_controls_count is at ${price_per_person_group_size_form_controls_count.value}`);
+            } else {
+                deletionTarget.remove();
+            }
+
+            // Decrement count
+            let formControlCollectionCount = document.getElementById(`${formControlCollectionName}_count`);
+
+            if (formControlCollectionCount.value == 0) {
+                console.log("Stay at zero (zero indexed count)");
+                e.target.disabled = true;
+            } else {
+                formControlCollectionCount.value--;
+                if (formControlCollectionCount.value == 0) {
+                    e.target.disabled = true;
+                    console.log("Disabled remove last added button");
+                }
+            }
+        }
+
+
+        // Add another form element(s) event listener
+        document.querySelectorAll(".add-another-form-btn").forEach(function (currentValue, currentIndex, listObj) {
+
+            currentValue.addEventListener('click', function (e) {
+                console.log("Clicked it");
+                duplicateFormControls(e);
+            });
+        });
+        // End Add another form element(s) event listener
+
+        // Remove last added duplicated form element(s) event listener
+        document.querySelectorAll(".remove-last-add-another").forEach(function (currentValue, currentIndex, listObj) {
+            currentValue.addEventListener('click', function (e) {
+                console.log("Clicked it");
+                removeLastAddedDuplicatedFormControl(e);
+            });
+
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<div class="form-row">
+    <h4>Fixed costs per person</h4>
+</div>
+<div class="form-row">
+    <p>Add any fixed-costs per person.</p>
+</div>
+<input type="hidden" id="fixed_person_cost_form_controls_count" name="fixed_person_cost_form_controls_count"
+    value="0" />
+<!-- Fixed per person cost form controls template -->
+<div class="form-row can-duplicate" data-form-control-collection-name="fixed_person_cost_form_controls" hidden>
+    <div class="form-group col-md-6">
+        <label for="fixed_per_person_cost_name-">Name of the fixed per-person cost</label>
+        <input type="text" class="form-control" name="fixed_per_person_cost_name-" id="fixed_per_person_cost_name-"
+            placeholder="Zoo entrance...">
+    </div>
+    <div class="form-group col-md-6">
+        <label for="fixed_per_person_cost_amount-">Amount</label>
+        <div class="input-group-prepend">
+            <div class="input-group-text">&pound;</div>
+            <input type="number" class="form-control" name="fixed_per_person_cost_amount-"
+                id="fixed_per_person_cost_amount-" placeholder="65">
+        </div>
+    </div>
+</div>
+<!-- End Fixed per person cost form controls template -->
+
+<div class="form-row">
+    <div class="form-group col-md-12 mt-auto">
+        <button type="button" class="btn btn-secondary add-another-form-btn" id="add-another-fixed-per-person-cost">Add
+            another fixed per-person cost</button>
+        <button type="button" class="btn btn-warning remove-last-add-another">Remove last added</button>
+    </div>
+</div>

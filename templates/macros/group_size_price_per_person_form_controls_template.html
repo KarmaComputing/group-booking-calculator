@@ -1,0 +1,90 @@
+{% macro can_duplicate_price_per_person_group_size_form_controls_template() -%}
+<div class="form-row can-duplicate" data-form-control-collection-name="price_per_person_group_size_form_controls"
+  data-form-control-collection-template="price_per_person_group_size_form_controls" hidden>
+  <div class="form-group col-md-4">
+    <label for="min_people_group_size_price-">Min</label>
+    <input type="number" class="form-control" name="min_people_group_size_price-" id="min_people_group_size_price-"
+      placeholder="1" {% if tour %}
+      value="{{ tour['pricing_rules']['price_per_person_based_on_size_of_group'][index]['min'] }}" {% endif %} />
+  </div>
+  <div class="form-group col-md-4">
+    <label for="max_people_group_size_price-">Max</label>
+    <input type="number" class="form-control" name="max_people_group_size_price-" id="max_people_group_size_price-"
+      placeholder="1" {% if tour %}
+      value="{{ tour['pricing_rules']['price_per_person_based_on_size_of_group'][index]['max'] }}" {% endif %} />
+  </div>
+  <div class="form-group col-md-4">
+    <label for="group_size_price_per_person-">Price per person</label>
+
+    <div class="input-group-prepend">
+      <div class="input-group-text">&pound;</div>
+      <input type="number" class="form-control" aria-describedby="group_size_price_per_person_help-"
+        name="group_size_price_per_person-" id="group_size_price_per_person-" placeholder="100" />
+    </div>
+    <small id="group_size_price_per_person_help-" class="form-text text-muted">Per person price for this group range
+      size</small>
+  </div>
+</div>
+{%- endmacro %}
+
+{% macro can_duplicate_price_per_person_group_size_form_controls(tour=None, index=0,
+price_per_person_group_size_form_controls_count=0) -%}
+<div class="form-row can-duplicate" data-form-control-collection-name="price_per_person_group_size_form_controls">
+  <div class="form-group col-md-4">
+    <label for="min_people_group_size_price-">Min. Index is {{ index }}</label>
+    <input type="number" class="form-control" name="min_people_group_size_price-{{ index }}"
+      id="min_people_group_size_price-{{ index }}" placeholder="1" {% if tour %}
+      value="{{ tour['pricing_rules']['price_per_person_based_on_size_of_group'][index]['min'] }}" {% endif %} />
+  </div>
+  <div class="form-group col-md-4">
+    <label for="max_people_group_size_price-{{ index }}">Max</label>
+    <input type="number" class="form-control" name="max_people_group_size_price-{{ index }}"
+      id="max_people_group_size_price-{{ index }}" placeholder="1" {% if tour %}
+      value="{{ tour['pricing_rules']['price_per_person_based_on_size_of_group'][index]['max'] }}" {% endif %} />
+  </div>
+  <div class="form-group col-md-4">
+    <label for="group_size_price_per_person-{{ index }}">Price per person</label>
+
+    <div class="input-group-prepend">
+      <div class="input-group-text">&pound;</div>
+      <input type="number" class="form-control" aria-describedby="group_size_price_per_person_help-{{ index }}"
+        name="group_size_price_per_person-{{ index }}" id="group_size_price_per_person-{{ index }}" placeholder="100" {%
+        if tour %}
+        value="{{ tour['pricing_rules']['price_per_person_based_on_size_of_group'][index]['price_per_person'] }}" {%
+        endif %} />
+    </div>
+    <small id="group_size_price_per_person_help-{{ index }}" class="form-text text-muted">Per person price for this
+      group range size</small>
+  </div>
+</div>
+{%- endmacro %}
+
+{% macro group_size_price_per_person_form_controls(price_per_person_group_size_form_controls_count=0, tour=None) -%}
+<!-- Price per person based on group size form controls template -->
+<div class="form-row">
+  <h4>
+    Price per person based on group size
+  </h4>
+</div>
+
+<input type="hidden" id="price_per_person_group_size_form_controls_count"
+  name="price_per_person_group_size_form_controls_count"
+  value="{{ price_per_person_group_size_form_controls_count }}" />
+
+{% for index in range(0, price_per_person_group_size_form_controls_count) %}
+{{ can_duplicate_price_per_person_group_size_form_controls(tour=tour, index=index) }}
+{% endfor %}
+
+<div class="form-row">
+  <div class="form-group col-md-12 mt-auto">
+    <button type="button" class="btn btn-secondary add-another-form-btn" id="add-another-group-per-person-price-range"
+      data-target-form-control-collection-template-name="price_per_person_group_size_form_controls">
+      Add group size per person price
+    </button>
+    <button type="button" class="btn btn-warning remove-last-add-another">
+      Remove last added
+    </button>
+  </div>
+</div>
+<!-- End Price per person based on group size form controls template -->
+{%- endmacro %}

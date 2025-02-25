@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+{% block title %}Edit Tour: {{ tour['name'] }}{% endblock %}
+
+{% block content %}
+{% from 'macros/group_size_price_per_person_form_controls_template.html' import
+can_duplicate_price_per_person_group_size_form_controls_template as
+can_duplicate_price_per_person_group_size_form_controls_template
+%}
+
+{% import 'macros/group_size_price_per_person_form_controls_template.html' as group_size_price_per_person_form_controls
+%}
+
+<h1>Edit Tour: {{ tour['name'] }}</h1>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class=flashes>
+  {% for message in messages %}
+  <li>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<div style="
+    background-color: #f8f9fa; /* Light background */
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.15), 
+                        inset -3px -3px 6px rgba(255, 255, 255, 0.7);
+    font-family: monospace;
+    ">
+  {{ tour }}
+</div>
+
+<form action="{{ url_for('edit_tour', tour_code=tour['tour_code']) }}" method="POST">
+  <div class="form-group">
+    <label for="tour_name">Tour name:</label>
+    <input id="tour_name" name="tour_name" class="form-control" aria-describedby="tour_name_help"
+      placeholder="London Pub Tour..." value="{{ tour['name'] }}">
+    <small id="tour_name_help" class="form-text text-muted">E.g. London Pub Tour</small>
+  </div>
+
+  <div class="form-group">
+    <label for="tour_code">Tour code:</label>
+    <input id="original_tour_code" name="original_tour_code" type="hidden" value="{{ tour['tour_code'] }}" />
+    <input id="tour_code" name="tour_code" class="form-control" aria-describedby="tour_code_help"
+      placeholder="LDNPUB2025" value="{{ tour['tour_code'] }}">
+    <small id="tour_code_help" class="form-text text-muted">E.g. LDNPUB2025</small>
+  </div>
+
+  <div class="form-group">
+    <label for="min_people">Minimal group size:</label>
+    <input id="min_people" type="number" name="min_people" class="form-control" aria-describedby="min_people_help"
+      placeholder="5" value="{{ tour['pricing_rules']['min_people'] }}" />
+    <small id="min_people_help" class="form-text text-muted">The minimal amount of people required to book this
+      tour.</small>
+  </div>
+
+  <div class="form-group">
+    <label for="max_people">Max group size:</label>
+    <input id="max_people" type="number" name="max_people" class="form-control" aria-describedby="max_people_help"
+      placeholder="5" value="{{ tour['pricing_rules']['min_people'] }}" />
+    <small id="max_people_help" class="form-text text-muted">The maximum number of people which can book this
+      tour.</small>
+  </div>
+
+  {{ can_duplicate_price_per_person_group_size_form_controls_template() }}
+
+  {{
+  group_size_price_per_person_form_controls.group_size_price_per_person_form_controls(price_per_person_group_size_form_controls_count=tour['pricing_rules']['price_per_person_based_on_size_of_group']|length
+  , tour=tour) }}
+
+
+
+  <!-- Fixed costs per person LOOP -->
+  <div class="form-row">
+    <h4>Fixed costs per person</h4>
+  </div>
+  <div class="form-row">
+    <p>Add any fixed-costs per person.</p>
+  </div>
+  <input type="hidden" id="fixed_person_cost_form_controls_count" name="fixed_person_cost_form_controls_count"
+    value="{{ tour['pricing_rules']['fix_costs_per_person']|length }}" />
+  {% for fix_cost_per_person in tour['pricing_rules']['fix_costs_per_person'] %}
+  <div class="form-row can-duplicate" data-form-control-collection-name="fixed_person_cost_form_controls">
+    <div class="form-group col-md-6">
+      <label for="fixed_per_person_cost_name-{{ loop.index0	}}">Name of the fixed per-person cost</label>
+      <input type="text" class="form-control" id="fixed_per_person_cost_name-{{ loop.index0	}}"
+        name="fixed_per_person_cost_name-{{ loop.index0	}}" value="{{ fix_cost_per_person['name'] }}"
+        placeholder="Zoo entrance...">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="fixed_per_person_cost_amount-{{ loop.index0	}}">Amount</label>
+      <div class="input-group-prepend">
+        <div class="input-group-text">&pound;</div>
+        <input type="number" class="form-control" id="fixed_per_person_cost_amount-{{ loop.index0	}}"
+          name="fixed_per_person_cost_amount-{{ loop.index0	}}" value="{{ fix_cost_per_person['amount'] }}"
+          placeholder="65">
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <div class="form-row">
+    <div class="form-group col-md-12 mt-auto">
+      <button type="button" class="btn btn-secondary add-another-form-btn" id="add-another-fixed-per-person-cost">Add
+        another fixed per-person cost</button>
+      <button type="button" class="btn btn-warning remove-last-add-another">Remove last added</button>
+    </div>
+  </div>
+  <!-- End Fixed costs per person LOOP -->
+
+  <button type="submit" class="btn btn-primary mb-5 mt-4">Save</button>
+</form>
+
+{% endblock content %}
