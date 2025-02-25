@@ -31,7 +31,7 @@
 price_per_person_group_size_form_controls_count=0) -%}
 <div class="form-row can-duplicate" data-form-control-collection-name="price_per_person_group_size_form_controls">
   <div class="form-group col-md-4">
-    <label for="min_people_group_size_price-">Min. Index is {{ index }}</label>
+    <label for="min_people_group_size_price-">Min</label>
     <input type="number" class="form-control" name="min_people_group_size_price-{{ index }}"
       id="min_people_group_size_price-{{ index }}" placeholder="1" {% if tour %}
       value="{{ tour['pricing_rules']['price_per_person_based_on_size_of_group'][index]['min'] }}" {% endif %} />
@@ -51,7 +51,7 @@ price_per_person_group_size_form_controls_count=0) -%}
         name="group_size_price_per_person-{{ index }}" id="group_size_price_per_person-{{ index }}" placeholder="100" {%
         if tour %}
         value="{{ tour['pricing_rules']['price_per_person_based_on_size_of_group'][index]['price_per_person'] }}" {%
-        endif %} />
+        endif %} required />
     </div>
     <small id="group_size_price_per_person_help-{{ index }}" class="form-text text-muted">Per person price for this
       group range size</small>

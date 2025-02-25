@@ -10,7 +10,7 @@ can_duplicate_price_per_person_group_size_form_controls_template
 {% import 'macros/group_size_price_per_person_form_controls_template.html' as group_size_price_per_person_form_controls
 %}
 
-<h1>Edit Tour: {{ tour['name'] }}</h1>
+<h1 class="mt-3 mb-4 text-center display-5">Edit Tour: {{ tour['name'] }}</h1>
 
 {% with messages = get_flashed_messages() %}
 {% if messages %}
@@ -102,9 +102,9 @@ can_duplicate_price_per_person_group_size_form_controls_template
   {% endfor %}
   <div class="form-row">
     <div class="form-group col-md-12 mt-auto">
-      <button type="button" class="btn btn-secondary add-another-form-btn" id="add-another-fixed-per-person-cost">Add
+      <button type="button" class="btn btn-secondary add-another-form-btn" id="add-another-fixed-per-person-cost" disabled>Add
         another fixed per-person cost</button>
-      <button type="button" class="btn btn-warning remove-last-add-another">Remove last added</button>
+      <button type="button" class="btn btn-warning remove-last-add-another" disabled>Remove last added</button>
     </div>
   </div>
   <!-- End Fixed costs per person LOOP -->
