@@ -2,6 +2,9 @@ from flask import Flask, render_template, flash, request, redirect, url_for
 import secrets
 import json
 import pickle
+import os
+
+STATE_DIR = os.getenv("BOOKING_STATE_DIR", "./state/")
 
 """
 
@@ -88,13 +91,12 @@ app.secret_key = secrets.token_hex()
 
 # Load previously pickled tours if present
 try:
-    fp = open("tours-pickle", mode="rb")
+    fp = open(f"{STATE_DIR}/tours-pickle", mode="rb")
     tours = pickle.load(fp)
     tours = json.loads(tours)
 except (FileNotFoundError, EOFError):
-    print("pickle file is FileNotFoundError or "
-          "EOFError. Writing empty tours list")
-    with open("tours-pickle", mode="wb") as fp:
+    print("pickle file is FileNotFoundError or " "EOFError. Writing empty tours list")  # noqa: E501
+    with open(f"{STATE_DIR}/tours-pickle", mode="wb") as fp:
         stub = json.dumps([])
         pickle.dump(stub, fp)
     fp = open("tours-pickle", mode="rb")
@@ -107,7 +109,7 @@ except Exception as e:
 
 def save_tours_to_pickle_file(tours):
     # TODO assure structure
-    with open("tours-pickle", mode="wb") as fp:
+    with open(f"{STATE_DIR}/tours-pickle", mode="wb") as fp:
         pickle.dump(json.dumps(tours), fp)
 
 
@@ -227,7 +229,9 @@ def add_tour():
 
     # Get fixed costs per person
     fix_costs_per_person = []
-    fixed_person_cost_form_controls_count = int(request.form["fixed_person_cost_form_controls_count"])  # noqa: E501
+    fixed_person_cost_form_controls_count = int(
+        request.form["fixed_person_cost_form_controls_count"]
+    )  # noqa: E501
 
     for index in range(0, fixed_person_cost_form_controls_count):
         fix_costs_per_person.append(
