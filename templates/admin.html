@@ -2,50 +2,70 @@
 {% block title %}Add Tour{% endblock %}
 
 {% block content %}
-{% from 'macros/group_size_price_per_person_form_controls_template.html' import can_duplicate_price_per_person_group_size_form_controls_template as can_duplicate_price_per_person_group_size_form_controls_template %}
-{% import 'macros/group_size_price_per_person_form_controls_template.html' as group_size_price_per_person_form_controls %}
+{% from 'macros/group_size_price_per_person_form_controls_template.html' import
+can_duplicate_price_per_person_group_size_form_controls_template as
+can_duplicate_price_per_person_group_size_form_controls_template %}
+{% import 'macros/group_size_price_per_person_form_controls_template.html' as group_size_price_per_person_form_controls
+%}
 
-{% from 'macros/fixed_person_cost_form_controls_template.html' import can_duplicate_fixed_person_cost_form_controls_template as can_duplicate_fixed_person_cost_form_controls_template %}
+{% from 'macros/fixed_person_cost_form_controls_template.html' import
+can_duplicate_fixed_person_cost_form_controls_template as can_duplicate_fixed_person_cost_form_controls_template %}
 {% import 'macros/fixed_person_cost_form_controls_template.html' as fixed_person_cost_form_controls %}
 
-  <div class="row">
-    <div class="col-md-12">
+<div class="row">
+  <div class="col-md-12">
     <h1 class="mt-3 mb-4 text-center display-5">Add Tour</h1>
 
     <form method="POST" action="{{ url_for('add_tour') }}">
       <div class="form-group">
         <label for="tour_name">Tour name:</label>
-        <input id="tour_name" name="tour_name" class="form-control" aria-describedby="tour_name_help" placeholder="London Pub Tour..." />
+        <input id="tour_name" name="tour_name" class="form-control" aria-describedby="tour_name_help"
+          placeholder="London Pub Tour..." required />
         <small id="tour_name_help" class="form-text text-muted">E.g. London Pub Tour</small>
       </div>
 
       <div class="form-group">
         <label for="tour_code">Tour code:</label>
-        <input id="tour_code" name="tour_code" class="form-control" aria-describedby="tour_code_help" placeholder="LDNPUB2025" />
+        <input id="tour_code" name="tour_code" class="form-control" aria-describedby="tour_code_help"
+          placeholder="LDNPUB2025" required />
         <small id="tour_code_help" class="form-text text-muted">E.g. LDNPUB2025</small>
       </div>
 
       <div class="form-group">
         <label for="min_people">Minimal group size:</label>
-        <input id="min_people" type="number" name="min_people" class="form-control" aria-describedby="min_people_help" placeholder="5" />
-        <small id="min_people_help" class="form-text text-muted">The minimal amount of people required to book this tour.</small>
+        <input id="min_people" type="number" name="min_people" class="form-control" aria-describedby="min_people_help"
+          placeholder="5" required />
+        <small id="min_people_help" class="form-text text-muted">The minimal amount of people required to book this
+          tour.</small>
       </div>
 
       <div class="form-group">
         <label for="max_people">Max group size:</label>
-        <input id="max_people" type="number" name="max_people" class="form-control" aria-describedby="max_people_help" placeholder="5" />
-        <small id="max_people_help" class="form-text text-muted">The maximum number of people which can book this tour.</small>
+        <input id="max_people" type="number" name="max_people" class="form-control" aria-describedby="max_people_help"
+          placeholder="5" required />
+        <small id="max_people_help" class="form-text text-muted">The maximum number of people which can book this
+          tour.</small>
       </div>
 
       {{ can_duplicate_price_per_person_group_size_form_controls_template() }}
-      {{ group_size_price_per_person_form_controls.group_size_price_per_person_form_controls(price_per_person_group_size_form_controls_count=0) }}
+      {{
+      group_size_price_per_person_form_controls.group_size_price_per_person_form_controls(price_per_person_group_size_form_controls_count=0)
+      }}
 
-      {{ can_duplicate_fixed_person_cost_form_controls_template() }}
-      {{ fixed_person_cost_form_controls.fixed_person_cost_form_controls(fixed_person_cost_form_controls_count=0) }}
+      {# {{ can_duplicate_fixed_person_cost_form_controls_template() }} #}
+      {# {{ fixed_person_cost_form_controls.fixed_person_cost_form_controls(fixed_person_cost_form_controls_count=0) }}
+      #}
+
+      <div class="form-row">
+        <h4>Fixed costs per person</h4>
+      </div>
+      <div class="form-row">
+        <p>Soon..</p>
+      </div>
 
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-    </div>
   </div>
+</div>
 
 {% endblock content %}

@@ -227,9 +227,7 @@ def add_tour():
 
     # Get fixed costs per person
     fix_costs_per_person = []
-    fixed_person_cost_form_controls_count = int(
-        request.form["fixed_person_cost_form_controls_count"]
-    )  # noqa: E501
+    fixed_person_cost_form_controls_count = 0 #TODO enable int(request.form["fixed_person_cost_form_controls_count"])  # noqa: E501
 
     for index in range(0, fixed_person_cost_form_controls_count):
         fix_costs_per_person.append(
