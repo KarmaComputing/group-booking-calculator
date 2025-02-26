@@ -1,39 +1,39 @@
 {% macro can_duplicate_fixed_person_cost_form_controls_template() -%}
 <!-- Fixed per person cost form controls template -->
-<div class="form-row can-duplicate" data-form-control-collection-name="fixed_person_cost_form_controls" hidden>
+<div class="form-row can-duplicate" data-form-control-collection-name="fixed_person_cost_form_controls"
+    data-form-control-collection-template="fixed_person_cost_form_controls" hidden>
     <div class="form-group col-md-6">
         <label for="fixed_per_person_cost_name-">Name of the fixed per-person cost</label>
         <input type="text" class="form-control" name="fixed_per_person_cost_name-" id="fixed_per_person_cost_name-"
-            placeholder="Zoo entrance..." required>
+            placeholder="Zoo entrance...">
     </div>
     <div class="form-group col-md-6">
         <label for="fixed_per_person_cost_amount-">Amount</label>
         <div class="input-group-prepend">
             <div class="input-group-text">&pound;</div>
             <input type="number" class="form-control" name="fixed_per_person_cost_amount-"
-                id="fixed_per_person_cost_amount-" placeholder="65" required>
+                id="fixed_per_person_cost_amount-" placeholder="65">
         </div>
     </div>
 </div>
 <!-- End Fixed per person cost form controls template -->
 {%- endmacro %}
 
-{% macro can_duplicate_fixed_person_cost_form_controls(tour=None, index=0,
-fixed_person_cost_form_controls_count=0) -%}
+{% macro can_duplicate_fixed_person_cost_form_controls(tour=None, index=0) -%}
 <div class="form-row can-duplicate" data-form-control-collection-name="fixed_person_cost_form_controls">
     <div class="form-group col-md-6">
-        <label for="fixed_per_person_cost_name-{{ loop.index0	}}">Name of the fixed per-person cost</label>
-        <input type="text" class="form-control" id="fixed_per_person_cost_name-{{ loop.index0	}}"
-            name="fixed_per_person_cost_name-{{ loop.index0	}}" value="{{ fix_cost_per_person['name'] }}"
-            placeholder="Zoo entrance...">
+        <label for="fixed_per_person_cost_name-{{ index	}}">Name of the fixed per-person cost</label>
+        <input type="text" class="form-control" id="fixed_per_person_cost_name-{{ index }}"
+            name="fixed_per_person_cost_name-{{ index }}"
+            value="{{ tour['pricing_rules']['fix_costs_per_person'][index]['name'] }}" placeholder="Zoo entrance...">
     </div>
     <div class="form-group col-md-6">
-        <label for="fixed_per_person_cost_amount-{{ loop.index0	}}">Amount</label>
+        <label for="fixed_per_person_cost_amount-{{ index }}">Amount</label>
         <div class="input-group-prepend">
             <div class="input-group-text">&pound;</div>
-            <input type="number" class="form-control" id="fixed_per_person_cost_amount-{{ loop.index0	}}"
-                name="fixed_per_person_cost_amount-{{ loop.index0	}}" value="{{ fix_cost_per_person['amount'] }}"
-                placeholder="65">
+            <input type="number" class="form-control" id="fixed_per_person_cost_amount-{{ index }}"
+                name="fixed_per_person_cost_amount-{{ index }}"
+                value="{{ tour['pricing_rules']['fix_costs_per_person'][index]['amount'] }}" placeholder="65">
         </div>
     </div>
 </div>
@@ -48,14 +48,21 @@ fixed_person_cost_form_controls_count=0) -%}
     <p>Add any fixed-costs per person.</p>
 </div>
 <input type="hidden" id="fixed_person_cost_form_controls_count" name="fixed_person_cost_form_controls_count"
-    value="0" />
+    value="{{ fixed_person_cost_form_controls_count}}" />
 
+
+{% for index in range(0, fixed_person_cost_form_controls_count) %}
+{{ can_duplicate_fixed_person_cost_form_controls(tour=tour, index=index) }}
+{% endfor %}
 
 <div class="form-row">
     <div class="form-group col-md-12 mt-auto">
-        <button type="button" class="btn btn-secondary add-another-form-btn" id="add-another-fixed-per-person-cost" disabled>Add
+        <button type="button" class="btn btn-secondary add-another-form-btn" id="add-another-fixed-per-person-cost"
+            data-target-form-control-collection-template-name="fixed_person_cost_form_controls">Add
             another fixed per-person cost</button>
-        <button type="button" class="btn btn-warning remove-last-add-another" disabled>Remove last added</button>
+        <button type="button" class="btn btn-warning remove-last-add-another"
+            data-target-form-control-collection-template-name="fixed_person_cost_form_controls">Remove last
+            added</button>
     </div>
 </div>
 {%- endmacro %}

@@ -139,15 +139,14 @@
                 }"]`);
             // END TODO
 
-            if (price_per_person_group_size_form_controls_count.value == 0) {
-                console.log(`Refusing to remove further form-controls because price_per_person_group_size_form_controls_count is at ${price_per_person_group_size_form_controls_count.value}`);
+            let formControlCollectionCount = document.getElementById(`${e.target.dataset.targetFormControlCollectionTemplateName}_count`);
+            if (formControlCollectionCount.value == 0) {
+                console.log(`Refusing to remove further form-controls because ${formControlCollectionCount.name} is at ${formControlCollectionCount.value}`);
             } else {
                 deletionTarget.remove();
             }
 
             // Decrement count
-            let formControlCollectionCount = document.getElementById(`${formControlCollectionName}_count`);
-
             if (formControlCollectionCount.value == 0) {
                 console.log("Stay at zero (zero indexed count)");
                 e.target.disabled = true;

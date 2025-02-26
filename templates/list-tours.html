@@ -8,7 +8,7 @@
     <ul class="list-group">
         {% for tour in tours %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ tour['name'] }}
+                {{ tour['name'] }} <span class="text-muted">{{ tour['tour_code']}}</span>
                 <a href="{{ url_for('edit_tour', tour_code=tour['tour_code']) }}" class="btn btn-sm btn-primary">Edit</a>
             </li>
         {% endfor %}
