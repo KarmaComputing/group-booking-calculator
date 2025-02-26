@@ -1,6 +1,6 @@
-# Tour Management System
+# Tour Management: Per-Person Cost Calculator
 
-This project is a Tour Management System. It allows tour operators to add, edit, and manage tours with various pricing rules such as pricing based on based on group size, and taking into account fixed costs per person.
+This project is a group tour per-person cost calculator. It allows tour operators to add, edit, and manage tours with various pricing rules such as pricing based on based on group size, and taking into account fixed costs per person.
 
 Per-person pricing can then more easily be calculated and presented back to customers wanting a quotation, whilst adjusting to the tour operators margins which change depending on the number of people attending.
 
