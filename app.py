@@ -215,7 +215,7 @@ def edit_tour(tour_code):
         )  # noqa: E501
         tours[original_tour_index] = updated_tour
         save_tours_to_pickle_file(tours)
-        flash("Tour edited")
+        flash(f'Tour "{tour_name}" updated')
     return redirect(url_for("list_tours"))
 
 
