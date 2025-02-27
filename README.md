@@ -18,9 +18,14 @@ Screenshot:
 ## Features
 
 - Add new tours with customisable pricing rules
-- Edit existing tours
 - Manage fixed costs per person and price per person based on group size
+- Simulate the costs of different group sizes with various fixed costs, taking into account group sizes
+- Edit existing tours
 - Simple file based storage- no complex database required
+
+### Simulate the costs of different group sizes with various fixed costs, taking into account group sizes
+
+![Simulate the costs of different group sizes](./static/screenshot-simulate-pricing.png)
 
 ## Installation
 

@@ -57,7 +57,7 @@ def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     print(f"Total fixed costs for {number_of_people}: {fixed_costs}")
 
     # fixed_costs x number_of_people
-    fixed_costs = fixed_costs * number_of_people
+    total_fixed_costs = fixed_costs * number_of_people
     # Calculate total_cost
     total_cost = fixed_costs
     print(f"Running cost is at: {total_cost}")
@@ -81,7 +81,11 @@ def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
 
     print(f"Total cost is: {total_cost}")
 
-    resp = {"total_cost": total_cost, "price_per_person": price_per_person}
+    resp = {
+        "total_cost": total_cost,
+        "total_fixed_costs": total_fixed_costs,
+        "price_per_person": price_per_person,
+    }
 
     return resp
 
