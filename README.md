@@ -76,6 +76,41 @@ tour-management-system/
 │       └── group_size_price_per_person_form_controls_template.html
 ```
 
+## Endpoints
+
+### `/api/calculate_cost_per_person` (`POST`)
+
+Returns the full costings of the given tour. See [Data Model](#data-model).
+
+### `/api/tour_per_person_price/<tour_code>/<int:number_of_people> (`GET`)
+
+Returns the costs for a given `tour_code` and `number_of_people`.
+
+E.g `curl http://127.0.0.1:5000/api/tour_per_person_price/LDNPUB2025/1`
+
+## Data model
+
+```python
+tour = {
+    "name": "London",
+    "tour_code": "LDNPUB2025",
+    "pricing_rules": {
+        "max_people": 10,
+        "min_people": 1,
+        "fix_costs_per_person": [
+            {"amount": 10, "name": "zoo_entrance"},
+            {"amount": 5, "name": "snack"},
+        ],
+        "price_per_person_based_on_size_of_group": [
+            {"min": 1, "max": 1, "price_per_person": 100},
+            {"min": 2, "max": 5, "price_per_person": 80},
+            {"min": 6, "max": 10, "price_per_person": 80},
+        ],
+    },
+    "cost_per_person": "calculate_cost_per_person",
+}
+```
+
 ## Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request with your changes.

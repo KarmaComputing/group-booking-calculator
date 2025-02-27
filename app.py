@@ -6,6 +6,7 @@ from flask import (
     redirect,
     url_for,
     jsonify,
+    after_this_request,
 )  # noqa: E501
 import secrets
 import json
@@ -245,6 +246,22 @@ def api_calculate_cost_per_person():
     tour = request.json.get("tour")
     resp = calculate_cost_per_person(tour, number_of_people)
     return jsonify(resp)
+
+
+@app.route(
+    "/api/tour_per_person_price/<tour_code>/<int:number_of_people>", methods=["GET"]
+)  # noqa: E501
+def api_get_tour_per_person_price_by_tour_code(tour_code, number_of_people):
+    @after_this_request
+    def add_header(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+    tour = get_tour_by_tour_code(tour_code)
+
+    costs = calculate_cost_per_person(tour, number_of_people)
+    # Remove total_fixed_costs from response
+    costs.pop('total_fixed_costs', None)
+    return jsonify(costs)
 
 
 @app.route("/api/tour", methods=["POST"])
