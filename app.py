@@ -1,4 +1,12 @@
-from flask import Flask, render_template, flash, request, redirect, url_for
+from flask import (
+    Flask,
+    render_template,
+    flash,
+    request,
+    redirect,
+    url_for,
+    jsonify,
+)  # noqa: E501
 import secrets
 import json
 import pickle
@@ -35,7 +43,7 @@ tour = {
 }
 
 
-def calculate_cost_per_person(tour, number_of_people):
+def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     total_cost = 0
     fixed_costs = 0
 
@@ -58,12 +66,13 @@ def calculate_cost_per_person(tour, number_of_people):
     for group_size_person_price_rule in tour["pricing_rules"][
         "price_per_person_based_on_size_of_group"
     ]:
-        if (
-            number_of_people >= group_size_person_price_rule["min"]
-            and number_of_people <= group_size_person_price_rule["max"]
-        ):
+        if number_of_people >= int(
+            group_size_person_price_rule["min"]
+        ) and number_of_people <= int(group_size_person_price_rule["max"]):
             print(f"Found the rule: {group_size_person_price_rule}")
-            price_per_person = group_size_person_price_rule["price_per_person"]
+            price_per_person = int(
+                group_size_person_price_rule["price_per_person"]
+            )  # noqa: E501
 
     # Apply cost per-person based on group size
     print("Applying per-person cost")
@@ -71,6 +80,10 @@ def calculate_cost_per_person(tour, number_of_people):
     print(f"Running cost is at: {total_cost}")
 
     print(f"Total cost is: {total_cost}")
+
+    resp = {"total_cost": total_cost, "price_per_person": price_per_person}
+
+    return resp
 
 
 def get_tour_by_tour_code(tour_code, get_index=False):
@@ -95,7 +108,10 @@ try:
     tours = pickle.load(fp)
     tours = json.loads(tours)
 except (FileNotFoundError, EOFError):
-    print("pickle file is FileNotFoundError or " "EOFError. Writing empty tours list")  # noqa: E501
+    print(
+        "pickle file is FileNotFoundError or "
+        "EOFError. Writing empty tours list"  # noqa: E501
+    )  # noqa: E501
     with open(f"{STATE_DIR}/tours-pickle", mode="wb") as fp:
         stub = json.dumps([])
         pickle.dump(stub, fp)
@@ -217,6 +233,14 @@ def edit_tour(tour_code):
         save_tours_to_pickle_file(tours)
         flash(f'Tour "{tour_name}" updated')
     return redirect(url_for("list_tours"))
+
+
+@app.route("/api/calculate_cost_per_person", methods=["POST"])
+def api_calculate_cost_per_person():
+    number_of_people = request.json.get("number_of_people")
+    tour = request.json.get("tour")
+    resp = calculate_cost_per_person(tour, number_of_people)
+    return jsonify(resp)
 
 
 @app.route("/api/tour", methods=["POST"])

@@ -76,7 +76,39 @@ can_duplicate_fixed_person_cost_form_controls_template as can_duplicate_fixed_pe
   , tour=tour) }}
 
   {{ can_duplicate_fixed_person_cost_form_controls_template() }}
-  {{ fixed_person_cost_form_controls.fixed_person_cost_form_controls(fixed_person_cost_form_controls_count=tour['pricing_rules']['fix_costs_per_person']|length, tour=tour) }}
+  {{
+  fixed_person_cost_form_controls.fixed_person_cost_form_controls(fixed_person_cost_form_controls_count=tour['pricing_rules']['fix_costs_per_person']|length,
+  tour=tour) }}
+
+
+  <div class="row">
+    <div class="col-md12">
+      <h2>Simulate Costs</h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="form-group">
+        <label for="simulateNumberOfPeople">Number of people</label>
+        <input id="simulateNumberOfPeople" min="1" step="1" type="number" class="form-control" required>
+      </div>
+    </div>
+    <div class="col-md-4 d-flex align-items-center">
+      <div class="form-group">
+        <label for="simulateNumberOfPeoplePerPersonPrice">Calculated per person price:</label>
+        <div class="input-group-prepend mb-2">
+          <div class="input-group-text">£</div>
+          <input id="simulateNumberOfPeoplePerPersonPrice" type="text" class="form-control" disabled>
+        </div>
+        <label for="simulateTotalCost">Calculated total cost:</label>
+        <div class="input-group-prepend mt-2">
+          <div class="input-group-text">£</div>
+          <input id="simulateTotalCost" type="text" class="form-control" disabled>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <button type="submit" class="btn btn-primary mb-5 mt-4">Save</button>
