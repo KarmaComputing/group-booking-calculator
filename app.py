@@ -7,13 +7,18 @@ from flask import (
     url_for,
     jsonify,
     after_this_request,
+    make_response,
 )  # noqa: E501
 import secrets
 import json
 import pickle
 import os
+from datetime import datetime, timezone
 
 STATE_DIR = os.getenv("BOOKING_STATE_DIR", "./state/")
+COMPANY_NAME = os.getenv("COMPANY_NAME", "")
+PACKAGE_BASE_URL = os.getenv("PACKAGE_BASE_URL", "")
+CORS_ORIGIN = os.getenv("CORS_ORIGIN", "http://127.0.0.1:5000")
 
 """
 
@@ -43,10 +48,41 @@ tour = {
     "cost_per_person": "calculate_cost_per_person",
 }
 
+booking = {
+    "tour_code": "LDNPUB2025",
+    "number_of_people": 10,
+    "quoted_price_per_person": 10,
+    "name": "Fred",
+    "email": "fred@example.com",
+    "wechat_id": "abc123",
+    "phone": "+4401234567890",
+    "desired_tour_start_date": "yyy/mm/dd",
+    "alternative_tour_start_time": "00:00",
+    "alternative_tour_pickup_point": "Pizza Planet",
+    "additional_transport_arrangement_requested": "Train",
+    "preferred_payment_method": "paypal",
+    "additional_comments": "Test",
+}
+
+"""
+TODO: add to wordpress html event listener for order button
+
+Array.from(document.getElementsByTagName("input")).forEach(function(input) {
+ if (input.value == "Submit Your Order") {
+     console.log(`Found it ${input}`);
+     input.addEventListener("click", function(e) {
+     alert("you clicked it!");
+     });
+ }
+});
+
+"""
+
 
 def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     total_cost = 0
     fixed_costs = 0
+    number_of_people = int(number_of_people)
 
     # Calculate the fixed costs
     for fixed_cost in tour["pricing_rules"]["fix_costs_per_person"]:
@@ -127,6 +163,26 @@ except (FileNotFoundError, EOFError):
 except Exception as e:
     print(f"Error pickle {e}")
 
+# Load previously picked bookings if present
+try:
+    fp = open(f"{STATE_DIR}/bookings-pickle", mode="rb")
+    bookings = pickle.load(fp)
+    bookings = json.loads(bookings)
+except (FileNotFoundError, EOFError):
+    print(
+        "pickle file is FileNotFoundError or "
+        "EOFError. Writing empty bookings list"  # noqa: E501
+    )  # noqa: E501
+    with open(f"{STATE_DIR}/bookings-pickle", mode="wb") as fp:
+        stub = json.dumps([])
+        pickle.dump(stub, fp)
+    fp = open("bookings-pickle", mode="rb")
+    # Load newly created empty bookings object
+    bookings = pickle.load(fp)
+    bookings = json.loads(bookings)
+except Exception as e:
+    print(f"Error pickle {e}")
+
 
 def save_tours_to_pickle_file(tours):
     # TODO assure structure
@@ -134,9 +190,124 @@ def save_tours_to_pickle_file(tours):
         pickle.dump(json.dumps(tours), fp)
 
 
+def save_bookings_to_pickle_file(bookings):
+    # TODO assure structure
+    with open(f"{STATE_DIR}/bookings-pickle", mode="wb") as fp:
+        pickle.dump(json.dumps(bookings), fp)
+
+
+@app.after_request
+def cors(response):
+    if request.method == "OPTIONS":
+        response = make_response()
+        response.headers.add("Access-Control-Allow-Origin", CORS_ORIGIN)  # noqa: E501
+        response.headers.add(
+            "Access-Control-Allow-Headers", "Content-Type"
+        )  # noqa: E501
+        return response
+    elif request.method == "POST":
+        response.headers.add("Access-Control-Allow-Origin", CORS_ORIGIN)  # noqa: E501
+
+    # Otherwise continue as normal
+    return response
+
+
+@app.context_processor
+def additional_utilities():
+    def get_tour_total_price(tour_code: str, number_of_people: int) -> int:
+        tour = get_tour_by_tour_code(tour_code)
+        if tour is None:
+            return f"unknown tour: {tour_code}"
+        return calculate_cost_per_person(tour, number_of_people)["total_cost"]
+
+    def get_tour_per_person_price(
+        tour_code: str, number_of_people: int
+    ) -> int:  # noqa: E501
+        tour = get_tour_by_tour_code(tour_code)
+        if tour is None:
+            return f"unknown tour: {tour_code}"
+        return calculate_cost_per_person(tour, number_of_people)[
+            "price_per_person"
+        ]  # noqa: E501
+
+    return dict(
+        get_tour_total_price=get_tour_total_price,
+        get_tour_per_person_price=get_tour_per_person_price,
+    )
+
+
+@app.template_filter("tsToHumanDateTime")
+def tsToHumanDateTime(timestamp):
+    try:
+        humanDateTime = datetime.fromtimestamp(timestamp).strftime(
+            "%Y/%m/%d %H:%M"
+        )  # noqa: E501
+    except Exception as e:
+        print(f"Error parsing timestamp: {e}")
+        humanDateTime = "Unknown"
+    return humanDateTime
+
+
 @app.route("/")
 def index():
     return render_template("admin.html")
+
+
+@app.route("/booking", methods=["GET"])
+def list_bookings():
+    return render_template(
+        "list-bookings.html",
+        bookings=bookings,
+        PACKAGE_BASE_URL=PACKAGE_BASE_URL,  # noqa: E501
+    )
+
+
+@app.route("/booking", methods=["POST"])
+def store_booking():
+    booking = request.get_json()
+    print(f"Echo'ing back the booking: {booking}")
+    save_bookings_to_pickle_file(bookings)
+    newBooking = {
+        "created_at_ts": datetime.now(tz=timezone.utc).timestamp(),
+        "tour_code": booking.get("tour_code"),
+        "number_of_people": booking.get("number_of_people"),
+        "name": booking.get("name"),
+        "email": booking.get("email"),
+        "wechat_id": booking.get("wechat_id"),
+        "phone": booking.get("phone"),
+        "desired_tour_start_date": booking.get("desired_tour_start_date"),
+        "alternative_tour_start_time": booking.get(
+            "alternative_tour_start_time"
+        ),  # noqa: E501
+        "alternative_tour_pickup_point": booking.get(
+            "alternative_tour_pickup_point"
+        ),  # noqa: E501
+        "additional_transport_arrangement_requested": booking.get(
+            "additional_transport_arrangement_requested"
+        ),
+        "preferred_payment_method": booking.get("preferred_payment_method"),
+        "additional_comments": booking.get("additional_comments"),
+    }
+    bookings.append(newBooking)
+    save_bookings_to_pickle_file(bookings)
+    return booking
+
+
+@app.route("/booking/thankyou/<string:name>", methods=["GET"])
+def thank_you(name):
+    msg = f"""
+    <pre>
+    Hi {name}!
+
+    Thanks for submitting your tour request.
+    We will check tour availability and get back to you as soon as we can.
+
+    Hoping we can give you a truly British experience!
+
+    Cheers,
+    {COMPANY_NAME}
+    """
+    return msg
 
 
 @app.route("/tours")
@@ -249,18 +420,20 @@ def api_calculate_cost_per_person():
 
 
 @app.route(
-    "/api/tour_per_person_price/<tour_code>/<int:number_of_people>", methods=["GET"]
+    "/api/tour_per_person_price/<tour_code>/<int:number_of_people>",
+    methods=["GET"],  # noqa: E501
 )  # noqa: E501
 def api_get_tour_per_person_price_by_tour_code(tour_code, number_of_people):
     @after_this_request
     def add_header(response):
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers["Access-Control-Allow-Origin"] = "*"
         return response
+
     tour = get_tour_by_tour_code(tour_code)
 
     costs = calculate_cost_per_person(tour, number_of_people)
     # Remove total_fixed_costs from response
-    costs.pop('total_fixed_costs', None)
+    costs.pop("total_fixed_costs", None)
     return jsonify(costs)
 
 

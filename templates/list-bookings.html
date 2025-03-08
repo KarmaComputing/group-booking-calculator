@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}Tour Bookings Admin Panel{% endblock %}
+
+{% block content %}
+
+    <h1 class="mt-3 mb-4 text-center display-6">Bookings</h1>
+
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">🗓️</th>
+        <th scope="col">Tour Code</th>
+        <th scope="col">Number in group</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Desired Start Date</th>
+        <th scope="col">Alternative Tour Start Time</th>
+        <th scope="col">Per Person Price</th>
+        <th scope="col">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for booking in bookings|reverse %}
+      <tr>
+        <th scope="row">{{ booking['created_at_ts']|tsToHumanDateTime }}</td>
+        <th>{{ booking['tour_code'] }} (<a href="{{ PACKAGE_BASE_URL }}/{{ booking['tour_code'] }} ">open</a>)</td>
+        <td>{{ booking['number_of_people'] }}</td>
+        <td>{{ booking['name'] }}</td>
+        <td>{{ booking['email'] }}</td>
+        <td>{{ booking['phone'] }}</td>
+        <td>{{ booking['desired_tour_start_date'] }}</td>
+        <td>{{ booking['alternative_tour_start_time'] }}</td>
+        <td>&pound;{{ get_tour_per_person_price(booking['tour_code'], booking['number_of_people']) }}</td>
+        <td>&pound;{{ get_tour_total_price(booking['tour_code'], booking['number_of_people']) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock content %}
+ 
