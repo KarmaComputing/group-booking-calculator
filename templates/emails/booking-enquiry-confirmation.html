@@ -1,0 +1,185 @@
+<html>
+	<head>
+    <title>{{ COMPANY_NAME }} - {{ TOUR_NAME }} Enquiry</title>
+	</head>
+	<body>
+    Hi {{ NAME }}!<br />
+<br />
+Thanks for submitting your tour request. Please find a review of your tour request below. We will check guide availability for your chosen tour and get back to you as soon as we can to confirm availability.<br />
+<br />
+Please note, this is not tour confirmation, and tours are not confirmed until you receive a confirmation email from us.<br />
+<br />
+If you are requesting a tour less than 36 hours ahead of the tour start date, or for any urgent enquiries, you are welcome to contact us at {{ SMTP_DEFAULT_FROM_ADDR }}.<br />
+<br />
+Hoping we can give you a truly British experience!<br />
+<br />
+Cheers!<br />
+<br />
+<a href="{{ COMPANY_WEB_ADDRESS }}"><img class=" wp-image-5701 aligncenter" src="{{ COMPANY_WEB_ADDRESS }}/wp-content/uploads/2015/10/Email-ending.png" alt="Email ending" width="635" height="155" /></a><br />
+<p style="text-align: center;">YOUR TOUR REQUEST</p><br />
+<table width="99%" border="0" cellpadding="1" cellspacing="0" bgcolor="#EAEAEA"><tr><td>
+                            <table width="100%" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
+                            <tr>
+                                        	<td colspan="2" style="font-size:14px; font-weight:bold; background-color:#EEE; border-bottom:1px solid #DFDFDF; padding:7px 7px">Tour Price</td>
+	                                   </tr>
+	                                   <tr bgcolor="#EAF2FA">
+		                                    <td colspan="2">
+		                                        <font style="font-family: sans-serif; font-size:12px;"><strong>Per Person Price</strong></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#FFFFFF">
+		                                    <td width="20">&nbsp;</td>
+		                                    <td>
+                                          <font style="font-family: sans-serif; font-size:12px;">&#163; {{ PRICE_PER_PERSON }}</font>
+		                                    </td>
+		                               </tr>
+		                               <tr>
+                                        	<td colspan="2" style="font-size:14px; font-weight:bold; background-color:#EEE; border-bottom:1px solid #DFDFDF; padding:7px 7px">I&#039;m ready to book!</td>
+	                                   </tr>
+	                                   <tr bgcolor="#EAF2FA">
+		                                    <td colspan="2">
+		                                        <font style="font-family: sans-serif; font-size:12px;"><strong>Name</strong></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#FFFFFF">
+		                                    <td width="20">&nbsp;</td>
+		                                    <td>
+                                          <font style="font-family: sans-serif; font-size:12px;">{{ NAME }}</font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#EAF2FA">
+		                                    <td colspan="2">
+		                                        <font style="font-family: sans-serif; font-size:12px;"><strong>Email</strong></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#FFFFFF">
+		                                    <td width="20">&nbsp;</td>
+		                                    <td>
+                                          <font style="font-family: sans-serif; font-size:12px;"><a href='mailto:{{ PERSON_EMAIL }}'>{{ PERSON_EMAIL }}</a></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#EAF2FA">
+		                                    <td colspan="2">
+		                                        <font style="font-family: sans-serif; font-size:12px;"><strong>WeChat ID</strong></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#FFFFFF">
+		                                    <td width="20">&nbsp;</td>
+		                                    <td>
+                                          <font style="font-family: sans-serif; font-size:12px;">{{ WECHAT_ID }}</font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#EAF2FA">
+		                                    <td colspan="2">
+		                                        <font style="font-family: sans-serif; font-size:12px;"><strong>Phone</strong></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#FFFFFF">
+		                                    <td width="20">&nbsp;</td>
+		                                    <td>
+                                          <font style="font-family: sans-serif; font-size:12px;">{{ PERSON_PHONE }}</font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#EAF2FA">
+		                                    <td colspan="2">
+		                                        <font style="font-family: sans-serif; font-size:12px;"><strong>Desired Tour Start Date</strong></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#FFFFFF">
+		                                    <td width="20">&nbsp;</td>
+		                                    <td>
+                                          <font style="font-family: sans-serif; font-size:12px;">{{ DESIRED_TOUR_START_DATE }}</font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#EAF2FA">
+		                                    <td colspan="2">
+		                                        <font style="font-family: sans-serif; font-size:12px;"><strong>Preferred payment method</strong></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#FFFFFF">
+		                                    <td width="20">&nbsp;</td>
+		                                    <td>
+                                          <font style="font-family: sans-serif; font-size:12px;">{{ PREFERRED_PAYMENT_METHOD }}</font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#EAF2FA">
+		                                    <td colspan="2">
+		                                        <font style="font-family: sans-serif; font-size:12px;"><strong>Additional Comments</strong></font>
+		                                    </td>
+		                               </tr>
+		                               <tr bgcolor="#FFFFFF">
+		                                    <td width="20">&nbsp;</td>
+		                                    <td>
+                                          <font style="font-family: sans-serif; font-size:12px;">{{ ADDITIONAL_COMMENTS }}</font>
+		                                    </td>
+		                               </tr>
+		                               <tr stayle="background-color:#EAF2FA">
+	<td colspan="2">
+		<strong style="font-family: sans-serif; font-size:12px;">Order</strong>
+	</td>
+</tr>
+<tr style="background-color: #FFFFFF">
+	<td style="width: 20px">&nbsp;</td>
+	<td>
+		<table cellspacing="0" style="border-left:1px solid #DFDFDF; border-top:1px solid #DFDFDF; width: 97%">
+			<thead>
+			<tr>
+				<th style="background-color:#F4F4F4; border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; font-family: sans-serif; font-size:12px; text-align:left">Product</th>
+				<th style="background-color:#F4F4F4; border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; width:50px; font-family: sans-serif; font-size:12px; text-align:center">Qty</th>
+				<th style="background-color:#F4F4F4; border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; width:155px; font-family: sans-serif; font-size:12px; text-align:left">Unit Price</th>
+				<th style="background-color:#F4F4F4; border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; width:155px; font-family: sans-serif; font-size:12px; text-align:left">Price</th>
+			</tr>
+			</thead>
+			<tbody>
+							<tr>
+					<td style="border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; font-family: sans-serif; font-size:11px;">
+            <strong style="color:#BF461E; font-size:12px; margin-bottom:5px">{{ TOUR_NAME }}</strong>
+							<ul style="margin:0">
+                <li style="padding:4px 0 4px 0">Tour number of people: {{ NUMBER_OF_PEOPLE }}</li>
+																					</ul>
+					</td>
+          <td style="border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; text-align:center; width:50px; font-family: sans-serif; font-size:11px;">{{ NUMBER_OF_PEOPLE }}</td>
+          <td style="border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; width:155px; font-family: sans-serif; font-size:11px;">&#163; {{ PRICE_PER_PERSON }}</td>
+          <td style="border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; width:155px; font-family: sans-serif; font-size:11px;">&#163; {{ TOTAL_COST }}</td>
+				</tr>
+						</tbody>
+			<tfoot>
+			<tr>
+				<td colspan="2" style="background-color:#F4F4F4; border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; font-size:11px;">&nbsp;</td>
+				<td style="border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; text-align:right; width:155px; font-family: sans-serif;">
+					<strong style="font-size:12px;">Sub Total</strong></td>
+				<td style="border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; width:155px; font-family: sans-serif;">
+          <strong style="font-size:12px;">&#163; {{ TOTAL_COST }}</strong>
+				</td>
+			</tr>
+						<tr>
+				<td colspan="2" style="background-color:#F4F4F4; border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; font-size:11px;">&nbsp;</td>
+				<td style="border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; text-align:right; width:155px; font-family: sans-serif;">
+					<strong style="font-size:12px;">Total</strong></td>
+				<td style="border-bottom:1px solid #DFDFDF; border-right:1px solid #DFDFDF; padding:7px; width:155px; font-family: sans-serif;">
+          <strong style="font-size:12px;">&#163; {{ TOTAL_COST }}</strong></td>
+			</tr>
+			</tfoot>
+		</table>
+	</td>
+</tr>
+</table>
+                        </td>
+                   </tr>
+               </table><br />
+<table border="0" width="470" cellspacing="0" cellpadding="0"><br />
+<tbody><br />
+<tr valign="top"><br />
+  <td><img class="aligncenter" src="{{ COMPANY_WEB_ADDRESS }}/email-sig-logo.png" alt="" /></td><br />
+<td><br />
+<div>{{ COMPANY_NAME }} </div><br />
+<div>Native British Mandarin-Speaking Guides</div><br />
+<div></div><br />
+<div><a href="{{ COMPANY_WEB_ADDRESS }}">{{ COMPANY_WEB_ADDRESS }}</a></div><br />
+<div>m: <a>{{ COMPANY_PHONE_NUMBER }} </a>e: <a href="mailto:{{ SMTP_DEFAULT_FROM_ADDR }}" target="_blank" rel="noopener">contact</a></div></td><br />
+</tr><br />
+</tbody><br />
+</table><br />
+&nbsp;
+	</body>
+</html>

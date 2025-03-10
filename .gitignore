@@ -5,3 +5,4 @@ venv
 __pycache__
 tours-pickle
 state
+run.sh

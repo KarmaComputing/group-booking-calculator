@@ -8,6 +8,7 @@ from flask import (
     jsonify,
     after_this_request,
     make_response,
+    current_app,
 )  # noqa: E501
 import secrets
 import json
@@ -17,8 +18,15 @@ from datetime import datetime, timezone
 
 STATE_DIR = os.getenv("BOOKING_STATE_DIR", "./state/")
 COMPANY_NAME = os.getenv("COMPANY_NAME", "")
+COMPANY_PHONE_NUMBER = os.getenv("COMPANY_PHONE_NUMBER")
 PACKAGE_BASE_URL = os.getenv("PACKAGE_BASE_URL", "")
 CORS_ORIGIN = os.getenv("CORS_ORIGIN", "http://127.0.0.1:5000")
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = os.getenv("SMTP_PORT", "465")
+SMTP_USERNAME = os.getenv("SMTP_USERNAME")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+SMTP_DEFAULT_FROM_ADDR = os.getenv("SMTP_DEFAULT_FROM_ADDR")
+COMPANY_WEB_ADDRESS = os.getenv("COMPANY_WEB_ADDRESS")
 
 """
 
@@ -293,21 +301,102 @@ def store_booking():
     return booking
 
 
-@app.route("/booking/thankyou/<string:name>", methods=["GET"])
-def thank_you(name):
-    msg = f"""
-    <pre>
-    Hi {name}!
+@app.route("/email/booking-quote/<int:booking_index>")
+def resend_booking_quote(booking_index):
+    num_bookings = len(bookings)
+    inverted_index = num_bookings - booking_index
+    booking = bookings[inverted_index]
+    send_booking_quote(booking["email"], booking)
+    flash("Booking quote re-sent")
+    return redirect(url_for("list_bookings"))
 
-    Thanks for submitting your tour request.
-    We will check tour availability and get back to you as soon as we can.
 
-    Hoping we can give you a truly British experience!
+def send_booking_quote(
+    to_addr,
+    booking,
+    from_addr=SMTP_DEFAULT_FROM_ADDR,
+):  # noqa: E501
+    import smtplib
+    from email.message import EmailMessage
+    from email.utils import make_msgid
+    from jinja2 import Template
+    from pathlib import Path
 
-    Cheers,
-    {COMPANY_NAME}
-    """
-    return msg
+    tour = get_tour_by_tour_code(booking["tour_code"])
+    costs = calculate_cost_per_person(tour, booking["number_of_people"])
+
+    TOUR_NAME = tour.get("name")
+    subject = f"{COMPANY_NAME} - {TOUR_NAME}"
+    NAME = booking.get("name")
+    PRICE_PER_PERSON = costs.get("price_per_person")
+    TOTAL_COST = costs.get("total_cost")
+    PERSON_EMAIL = booking.get("email")
+    WECHAT_ID = booking.get("wechat_id")
+    PERSON_PHONE = booking.get("phone")
+    DESIRED_TOUR_START_DATE = booking.get("desired_tour_start_date")
+    PREFERRED_PAYMENT_METHOD = booking.get("preferred_payment_method")
+    ADDITIONAL_COMMENTS = booking.get("additional_comments")
+    NUMBER_OF_PEOPLE = booking.get("number_of_people")
+
+    plainTextbody = (
+        f"Hi {NAME}!\n"
+        "Please find a review of your tour request below. We will check guide "
+        "availability for your chosen tour and get back to you as "
+        "soon as we can "
+        "to confirm availability.\n\n"
+        "Please note, this is not tour confirmation, and tours "
+        "are not confirmed "
+        "until you receive a confirmation email from us.\n\n"
+        "If you are requesting a tour less than 36 hours "
+        "ahead of the tour start "
+        "date, or for any urgent enquiries, you are welcome to contact us at "
+        f"{SMTP_DEFAULT_FROM_ADDR}.\n\n"
+        "Hoping we can give you a truly British experience!\n\n"
+        "Cheers!"
+    )
+
+    # html Template booking
+    template = str(
+        Path(
+            f"{current_app.root_path}/templates/emails/booking-enquiry-confirmation.html"  # noqa: E501
+        )  # noqa: E501
+    )
+    fp = open(template)
+    template = fp.read()
+    fp.close()
+
+    jinja_template = Template(template)
+
+    html = jinja_template.render(
+        COMPANY_NAME=COMPANY_NAME,
+        COMPANY_PHONE_NUMBER=COMPANY_PHONE_NUMBER,
+        TOUR_NAME=TOUR_NAME,
+        NAME=NAME,
+        PRICE_PER_PERSON=PRICE_PER_PERSON,
+        PERSON_EMAIL=PERSON_EMAIL,
+        WECHAT_ID=WECHAT_ID,
+        PERSON_PHONE=PERSON_PHONE,
+        DESIRED_TOUR_START_DATE=DESIRED_TOUR_START_DATE,
+        PREFERRED_PAYMENT_METHOD=PREFERRED_PAYMENT_METHOD,
+        ADDITIONAL_COMMENTS=ADDITIONAL_COMMENTS,
+        NUMBER_OF_PEOPLE=NUMBER_OF_PEOPLE,
+        TOTAL_COST=TOTAL_COST,
+        COMPANY_WEB_ADDRESS=COMPANY_WEB_ADDRESS,
+        SMTP_DEFAULT_FROM_ADDR=SMTP_DEFAULT_FROM_ADDR,
+    )
+
+    msg = EmailMessage()
+    msg.set_content(plainTextbody)  # PlainText body
+    msg.add_alternative(html, subtype="html")
+    msg["Subject"] = subject
+    msg["From"] = from_addr
+    msg["To"] = to_addr
+    msg.add_header("Message-ID", make_msgid())
+
+    s = smtplib.SMTP_SSL(host=SMTP_HOST, port=SMTP_PORT)
+    s.login(SMTP_USERNAME, SMTP_PASSWORD)
+    s.set_debuglevel(1)
+    s.send_message(msg)
 
 
 @app.route("/tours")
