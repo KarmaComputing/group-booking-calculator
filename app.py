@@ -15,6 +15,9 @@ import json
 import pickle
 import os
 from datetime import datetime, timezone
+from dotenv import load_dotenv
+
+load_dotenv(verbose=True)  # take environment variables from .env.
 
 STATE_DIR = os.getenv("BOOKING_STATE_DIR", "./state/")
 COMPANY_NAME = os.getenv("COMPANY_NAME", "")

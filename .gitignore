@@ -6,3 +6,6 @@ __pycache__
 tours-pickle
 state
 run.sh
+.env
+run-debug.sh
+debug.sh
