@@ -132,7 +132,7 @@ def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     # fixed_costs x number_of_people
     total_fixed_costs = fixed_costs * number_of_people
     # Calculate total_cost
-    total_cost = fixed_costs
+    total_cost = total_fixed_costs
     print(f"Running cost is at: {total_cost}")
 
     # Find the matching group_size_person_price_rule
