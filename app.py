@@ -90,6 +90,31 @@ Array.from(document.getElementsByTagName("input")).forEach(function(input) {
 """
 
 
+def get_tours() -> dict:
+    # Load previously pickled tours if present
+    try:
+        fp = open(f"{STATE_DIR}/tours-pickle", mode="rb")
+        tours = pickle.load(fp)
+        tours = json.loads(tours)
+    except (FileNotFoundError, EOFError):
+        print(
+            "pickle file is FileNotFoundError or "
+            "EOFError. Writing empty tours list"  # noqa: E501
+        )  # noqa: E501
+        with open(f"{STATE_DIR}/tours-pickle", mode="wb") as fp:
+            stub = json.dumps([])
+            pickle.dump(stub, fp)
+        fp = open("tours-pickle", mode="rb")
+        # Load newly created empty tours object
+        tours = pickle.load(fp)
+        tours = json.loads(tours)
+
+    except Exception as e:
+        print(f"Error pickle {e}")
+
+    return tours
+
+
 def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     total_cost = 0
     fixed_costs = 0
@@ -143,6 +168,7 @@ def get_tour_by_tour_code(tour_code, get_index=False):
     Return tour object from tours by tour_code or
     it's tour index if get_index is True
     """
+    tours = get_tours()
     for index, tour in enumerate(tours):
         if tour["tour_code"] == tour_code:
             if get_index:
@@ -154,25 +180,6 @@ def get_tour_by_tour_code(tour_code, get_index=False):
 app = Flask(__name__)
 app.secret_key = secrets.token_hex()
 
-# Load previously pickled tours if present
-try:
-    fp = open(f"{STATE_DIR}/tours-pickle", mode="rb")
-    tours = pickle.load(fp)
-    tours = json.loads(tours)
-except (FileNotFoundError, EOFError):
-    print(
-        "pickle file is FileNotFoundError or "
-        "EOFError. Writing empty tours list"  # noqa: E501
-    )  # noqa: E501
-    with open(f"{STATE_DIR}/tours-pickle", mode="wb") as fp:
-        stub = json.dumps([])
-        pickle.dump(stub, fp)
-    fp = open("tours-pickle", mode="rb")
-    # Load newly created empty tours object
-    tours = pickle.load(fp)
-    tours = json.loads(tours)
-except Exception as e:
-    print(f"Error pickle {e}")
 
 # Load previously picked bookings if present
 try:
@@ -404,11 +411,13 @@ def send_booking_quote(
 
 @app.route("/tours")
 def list_tours():
+    tours = get_tours()
     return render_template("list-tours.html", tours=tours)
 
 
 @app.route("/tour/edit/<tour_code>", methods=["GET", "POST"])
 def edit_tour(tour_code):
+    tours = get_tours()
     tour = get_tour_by_tour_code(tour_code)
     original_tour_code = request.form.get("original_tour_code")
 
@@ -531,6 +540,7 @@ def api_get_tour_per_person_price_by_tour_code(tour_code, number_of_people):
 
 @app.route("/api/tour", methods=["POST"])
 def add_tour():
+    tours = get_tours()
     # Get tour name
     tour_name = request.form.get("tour_name")
     tour_code = request.form.get("tour_code")
