@@ -44,7 +44,7 @@ tour = {
     "name": "London",
     "tour_code": "LDNPUB2025",
     "pricing_rules": {
-        "max_people": 10,
+        "max_people": 11,
         "min_people": 1,
         "fix_costs_per_person": [
             {"amount": 10, "name": "zoo_entrance"},
@@ -76,7 +76,7 @@ tour = {
         "price_per_person_based_on_size_of_group": [
             {"min": 1, "max": 1, "price_per_person": 100},
             {"min": 2, "max": 5, "price_per_person": 80},
-            {"min": 6, "max": 10, "price_per_person": 80},
+            {"min": 6, "max": 99, "price_per_person": 80},
         ],
     },
     "cost_per_person": "calculate_cost_per_person",
@@ -185,6 +185,39 @@ def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     # - 3 people would 'fit' into a transport of min:1 max:3
     # - 1 person would 'fit' into a transport of min:1 max: 3
     # = Target group size catered for (11 people)
+
+    target_group_size = number_of_people
+
+    # Identify fixed_cost_per_group_size with the same "name"
+    # and group them
+    grouped_fixed_group_size = {}
+    for index, fixed_cost_based_on_group_size in enumerate(
+        tour["pricing_rules"]["fixed_costs_based_on_group_size"]
+    ):
+        if fixed_cost_based_on_group_size["name"] not in grouped_fixed_group_size:
+            # "count" is the number of entries for a common
+            # fixed_cost_based_on_group_size, such as 'transport'
+            grouped_fixed_group_size[fixed_cost_based_on_group_size["name"]] = []
+            grouped_fixed_group_size[fixed_cost_based_on_group_size["name"]].append(
+                fixed_cost_based_on_group_size
+            )
+        else:
+            grouped_fixed_group_size[fixed_cost_based_on_group_size["name"]].append(
+                fixed_cost_based_on_group_size
+            )
+    # Try and 'fit' the target_group_size into largest group size
+    # for each grouped_fixed_group_size
+    for index, fixed_cost_group_size_group_name in enumerate(grouped_fixed_group_size):
+        # Find the matching group size for given grouped fixed cost brackets
+        grouped_fixed_group_size[
+            fixed_cost_group_size_group_name
+        ]  # Do/min/number_of_people calcualation
+        breakpoint()
+        pass
+
+    breakpoint()
+
+    # fitting fixed_costs_based_on_group_size
 
     print(f"Total cost is: {total_cost}")
 
