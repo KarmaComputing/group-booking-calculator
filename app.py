@@ -50,6 +50,29 @@ tour = {
             {"amount": 10, "name": "zoo_entrance"},
             {"amount": 5, "name": "snack"},
         ],
+        "fixed_costs_based_on_group_size": [
+            {
+                "name": "transport",
+                "min": 1,
+                "max": 3,
+                "price": 400,
+                "mutually_exclusive": True,
+            },
+            {
+                "name": "transport",
+                "min": 4,
+                "max": 7,
+                "price": 500,
+                "mutually_exclusive": True,
+            },
+            {
+                "name": "Large Group Fee",
+                "min": 4,
+                "max": 7,
+                "price": 50,
+                "mutually_exclusive": False,
+            },
+        ],
         "price_per_person_based_on_size_of_group": [
             {"min": 1, "max": 1, "price_per_person": 100},
             {"min": 2, "max": 5, "price_per_person": 80},
