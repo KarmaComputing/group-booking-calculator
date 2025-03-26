@@ -56,21 +56,21 @@ tour = {
                 "min": 1,
                 "max": 3,
                 "price": 400,
-                "mutually_exclusive": True,
+                "mutually_exclusive": False,
             },
             {
                 "name": "transport",
                 "min": 4,
                 "max": 7,
                 "price": 500,
-                "mutually_exclusive": True,
+                "mutually_exclusive": False,
             },
             {
                 "name": "Large Group Fee",
                 "min": 4,
                 "max": 7,
                 "price": 50,
-                "mutually_exclusive": False,
+                "mutually_exclusive": True,
             },
         ],
         "price_per_person_based_on_size_of_group": [
@@ -174,6 +174,17 @@ def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     print("Applying per-person cost")
     total_cost = total_cost + (price_per_person * number_of_people)
     print(f"Running cost is at: {total_cost}")
+
+    # Apply fixed_costs_based_on_group_size
+    # These are costs, such as vehicle hire
+    # "mutually_exclusive" is for when a cost is based on group size,
+    # but (based on its name) may only be applied once.
+    # For example, if there's 11 people in a group (target group size),
+    # split accross vehicles (bin packing?), then:
+    # - 7 People would 'fit' into a transport size of min:4 max:7
+    # - 3 people would 'fit' into a transport of min:1 max:3
+    # - 1 person would 'fit' into a transport of min:1 max: 3
+    # = Target group size catered for (11 people)
 
     print(f"Total cost is: {total_cost}")
 
