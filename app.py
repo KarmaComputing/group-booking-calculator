@@ -53,6 +53,7 @@ tour = {
         "fixed_costs_based_on_group_size": [
             {
                 "name": "transport",
+                "description": "Small taxi",
                 "min": 1,
                 "max": 3,
                 "price": 400,
@@ -60,16 +61,24 @@ tour = {
             },
             {
                 "name": "transport",
+                "description": "Multi-Purpose Vehicle (MPV)",
                 "min": 4,
                 "max": 7,
                 "price": 500,
                 "mutually_exclusive": False,
             },
             {
-                "name": "Large Group Fee",
-                "min": 4,
-                "max": 7,
+                "name": "Booking Fee",
+                "min": 1,
+                "max": 3,
                 "price": 50,
+                "mutually_exclusive": True,
+            },
+            {
+                "name": "Booking Fee",
+                "min": 4,
+                "max": 99,
+                "price": 75,
                 "mutually_exclusive": True,
             },
         ],
@@ -177,8 +186,9 @@ def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
 
     # Apply fixed_costs_based_on_group_size
     # These are costs, such as vehicle hire
-    # "mutually_exclusive" is for when a cost is based on group size,
-    # but (based on its name) may only be applied once.
+    # Non "mutually_exclusive" is for when a cost is based on group size,
+    # but (based on its name) may by applied multiple times to allocate a given
+    # number_of_people.
     # For example, if there's 11 people in a group (target group size),
     # split accross vehicles (bin packing?), then:
     # - 7 People would 'fit' into a transport size of min:4 max:7
@@ -208,14 +218,105 @@ def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     # Try and 'fit' the target_group_size into largest group size
     # for each grouped_fixed_group_size
     for index, fixed_cost_group_size_group_name in enumerate(grouped_fixed_group_size):
+        num_unallocated_people = (
+            number_of_people  # At the begining, nobody is allocated
+        )
+        print(
+            f"num_unallocated_people for rule '{fixed_cost_group_size_group_name}' is now: {num_unallocated_people}"
+        )  # noqa: E501
+
         # Find the matching group size for given grouped fixed cost brackets
-        grouped_fixed_group_size[
+        fixed_cost_group_rules = grouped_fixed_group_size[
             fixed_cost_group_size_group_name
         ]  # Do/min/number_of_people calcualation
-        breakpoint()
-        pass
 
-    breakpoint()
+        # Only attempt to assign further group size fixed costs
+        # if num_unallocated_people has not yet reached 0
+        # For example, transport has been 'allocated' accross all
+        # available transport
+        # TODO support duplication of too-small groups (e.g.
+        # can't fit 5 into a rule of max 2, but can fit 2+2+1.
+
+        def allocate_people_to_group_size_costs(
+            fixed_cost_group_rules, num_unallocated_people, flag_first_pass=True
+        ):
+            if flag_first_pass:
+                # Focus on large 'max' rules on first pass
+                # For example, bundle majority of group into largest
+                # transport option(s)
+                # Reverse sort the fixed_cost_group_rules by 'max' first
+                # (so that we can find the largest fitting 'max' from number_of_people
+                # first)
+                fixed_cost_group_rules = sorted(
+                    fixed_cost_group_rules,
+                    key=lambda values: values["max"],
+                    reverse=True,
+                )
+            else:
+                # Given this is seccond or more pass,
+                # focus on smaller 'max' rules first.
+                # For example, this 'will' bundle the remaining
+                # unallocated_people starting with the smaller transport
+                # options
+                fixed_cost_group_rules = sorted(
+                    fixed_cost_group_rules,
+                    key=lambda values: values["max"],
+                    reverse=False,
+                )
+
+            for fixed_cost_group_rule in fixed_cost_group_rules:
+                # Check if first rule 'fits' within the number_of_people,
+                # if yes, associate this cost & decrement the number of
+                # unallocated_people
+                if (
+                    fixed_cost_group_rule["min"] <= number_of_people
+                    and num_unallocated_people > 0
+                ):
+                    # TODO flag/mark rule as to apply to total cost
+                    print(
+                        f"Identified matching group size pp cost rule for number_of_people ({number_of_people})"
+                    )  # noqa: E501
+                    print(fixed_cost_group_rule)
+                    print(
+                        f"Taking {fixed_cost_group_rule['max']} away from num_unallocated_people"  # noqa: E501
+                    )
+                    num_unallocated_people -= fixed_cost_group_rule["max"]
+                    print(
+                        f"num_unallocated_people is now: {num_unallocated_people}"  # noqa: E501
+                    )
+            return num_unallocated_people
+
+        # Non mutually_exclusive rules are grouped pricing rules which
+        # fit the num_unallocated_people accross the available options/rules
+        # within that named group of which there are multiple min/max pricing
+        # E.g. Transport pricing with difference capacity. There might be
+        # two (or more) transport possibilityes (e.g. small taxi with max 3
+        # people capacity), and Large taxi with max 6 people.
+        # Both rules may be called 'transport' and one, both or none may be
+        # 'fit' the number_of_people. e.g. if 11 people, these would fix accross
+        # two small taxis, and one large taxi (because 3 * 2 = 6, and plux 6 from
+        # the large taxi gives 12, enough for 11 people.
+        #
+        # Then mutually_exclusive is True, that means
+        # only one of the costs (**within that group**) will be applied, and
+        # no attempt to apply multiple rules within that group apply- only
+        # the most fitting group size cost will apply.
+        # For example, a tour operator may choose to apply an 'admin fee'
+        # dependant on the *size* of the group booking. e.g. a
+        # "Booking Fee" which may be higher for larger group sizes
+        # (to account for the communication overhead cost).
+        if fixed_cost_group_rules[0]["mutually_exclusive"] == False:
+            flag_first_pass = True
+            while num_unallocated_people > 0:
+                num_unallocated_people = allocate_people_to_group_size_costs(
+                    fixed_cost_group_rules,
+                    num_unallocated_people,
+                    flag_first_pass=flag_first_pass,
+                )
+                flag_first_pass = False
+        elif fixed_cost_group_rules[0]["mutually_exclusive"] == True:
+            # TODO calculate / add mutually_exclusive costs
+            pass
 
     # fitting fixed_costs_based_on_group_size
 
