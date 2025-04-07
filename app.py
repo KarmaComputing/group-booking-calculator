@@ -284,7 +284,7 @@ def list_bookings():
     )
 
 
-@app.route("/booking", methods=["POST"])
+@app.route("/api/booking", methods=["POST"])
 def store_booking():
     booking = request.get_json()
     bookings = get_bookings()
