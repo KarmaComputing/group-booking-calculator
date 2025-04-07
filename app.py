@@ -115,6 +115,31 @@ def get_tours() -> dict:
     return tours
 
 
+def get_bookings() -> dict:
+    # Load previously pickled bookings if present
+    try:
+        fp = open(f"{STATE_DIR}/bookings-pickle", mode="rb")
+        bookings = pickle.load(fp)
+        bookings = json.loads(bookings)
+    except (FileNotFoundError, EOFError):
+        print(
+            "pickle file is FileNotFoundError or "
+            "EOFError. Writing empty bookings list"  # noqa: E501
+        )  # noqa: E501
+        with open(f"{STATE_DIR}/bookings-pickle", mode="wb") as fp:
+            stub = json.dumps([])
+            pickle.dump(stub, fp)
+        fp = open("bookings-pickle", mode="rb")
+        # Load newly created empty bookings object
+        bookings = pickle.load(fp)
+        bookings = json.loads(bookings)
+
+    except Exception as e:
+        print(f"Error pickle {e}")
+
+    return bookings
+
+
 def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
     total_cost = 0
     fixed_costs = 0
@@ -179,27 +204,6 @@ def get_tour_by_tour_code(tour_code, get_index=False):
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex()
-
-
-# Load previously picked bookings if present
-try:
-    fp = open(f"{STATE_DIR}/bookings-pickle", mode="rb")
-    bookings = pickle.load(fp)
-    bookings = json.loads(bookings)
-except (FileNotFoundError, EOFError):
-    print(
-        "pickle file is FileNotFoundError or "
-        "EOFError. Writing empty bookings list"  # noqa: E501
-    )  # noqa: E501
-    with open(f"{STATE_DIR}/bookings-pickle", mode="wb") as fp:
-        stub = json.dumps([])
-        pickle.dump(stub, fp)
-    fp = open("bookings-pickle", mode="rb")
-    # Load newly created empty bookings object
-    bookings = pickle.load(fp)
-    bookings = json.loads(bookings)
-except Exception as e:
-    print(f"Error pickle {e}")
 
 
 def save_tours_to_pickle_file(tours):
@@ -275,7 +279,7 @@ def index():
 def list_bookings():
     return render_template(
         "list-bookings.html",
-        bookings=bookings,
+        bookings=get_bookings(),
         PACKAGE_BASE_URL=PACKAGE_BASE_URL,  # noqa: E501
     )
 
@@ -283,6 +287,7 @@ def list_bookings():
 @app.route("/booking", methods=["POST"])
 def store_booking():
     booking = request.get_json()
+    bookings = get_bookings()
     print(f"Echo'ing back the booking: {booking}")
     save_bookings_to_pickle_file(bookings)
     newBooking = {
@@ -313,6 +318,7 @@ def store_booking():
 
 @app.route("/email/booking-quote/<int:booking_index>")
 def resend_booking_quote(booking_index):
+    bookings = get_bookings()
     num_bookings = len(bookings)
     inverted_index = num_bookings - booking_index
     booking = bookings[inverted_index]
