@@ -179,10 +179,20 @@ def calculate_cost_per_person(tour: dict, number_of_people: int) -> dict:
 
     print(f"Total cost is: {total_cost}")
 
+    print("Decorating resp with calculated total_per_person_cost:")
+    print(
+        f"int({price_per_person} + ({total_fixed_costs} / {number_of_people}))"
+    )  # noqa: E501
+    total_per_person_cost = int(
+        price_per_person + (total_fixed_costs / number_of_people)
+    )
+    print(f"total_per_person_cost calculated as: {total_per_person_cost}")
+
     resp = {
         "total_cost": total_cost,
         "total_fixed_costs": total_fixed_costs,
         "price_per_person": price_per_person,
+        "total_per_person_cost": total_per_person_cost,
     }
 
     return resp
@@ -539,8 +549,6 @@ def api_get_tour_per_person_price_by_tour_code(tour_code, number_of_people):
     tour = get_tour_by_tour_code(tour_code)
 
     costs = calculate_cost_per_person(tour, number_of_people)
-    # Remove total_fixed_costs from response
-    costs.pop("total_fixed_costs", None)
     return jsonify(costs)
 
 
