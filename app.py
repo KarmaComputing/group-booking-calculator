@@ -323,6 +323,8 @@ def store_booking():
     }
     bookings.append(newBooking)
     save_bookings_to_pickle_file(bookings)
+    print("Notify admin via email")
+    send_admin_email_booking_notification(booking.get("email"), newBooking)
     return booking
 
 
@@ -417,6 +419,77 @@ def send_booking_quote(
     msg["Subject"] = subject
     msg["From"] = from_addr
     msg["To"] = to_addr
+    msg.add_header("Message-ID", make_msgid())
+
+    s = smtplib.SMTP_SSL(host=SMTP_HOST, port=SMTP_PORT)
+    s.login(SMTP_USERNAME, SMTP_PASSWORD)
+    s.set_debuglevel(1)
+    s.send_message(msg)
+
+
+def send_admin_email_booking_notification(
+    to_addr,
+    booking,
+    from_addr=SMTP_DEFAULT_FROM_ADDR,
+):  # noqa: E501
+    import smtplib
+    from email.message import EmailMessage
+    from email.utils import make_msgid
+    from jinja2 import Template
+    from pathlib import Path
+
+    tour = get_tour_by_tour_code(booking["tour_code"])
+    costs = calculate_cost_per_person(tour, booking["number_of_people"])
+
+    TOUR_NAME = tour.get("name")
+    subject = f"{COMPANY_NAME} - {TOUR_NAME}"
+    NAME = booking.get("name")
+    PRICE_PER_PERSON = costs.get("price_per_person")
+    TOTAL_COST = costs.get("total_cost")
+    PERSON_EMAIL = booking.get("email")
+    WECHAT_ID = booking.get("wechat_id")
+    PERSON_PHONE = booking.get("phone")
+    DESIRED_TOUR_START_DATE = booking.get("desired_tour_start_date")
+    PREFERRED_PAYMENT_METHOD = booking.get("preferred_payment_method")
+    ADDITIONAL_COMMENTS = booking.get("additional_comments")
+    NUMBER_OF_PEOPLE = booking.get("number_of_people")
+
+    plainTextbody = "New booking!\nhttp://booking.beiwei55.co.uk/\n\n"
+
+    # html Template booking
+    template = str(
+        Path(
+            f"{current_app.root_path}/templates/emails/new-booking-notification.html"  # noqa: E501
+        )  # noqa: E501
+    )
+    fp = open(template)
+    template = fp.read()
+    fp.close()
+
+    jinja_template = Template(template)
+
+    html = jinja_template.render(
+        TOUR_NAME=TOUR_NAME,
+        NAME=NAME,
+        PRICE_PER_PERSON=PRICE_PER_PERSON,
+        PERSON_EMAIL=PERSON_EMAIL,
+        WECHAT_ID=WECHAT_ID,
+        PERSON_PHONE=PERSON_PHONE,
+        DESIRED_TOUR_START_DATE=DESIRED_TOUR_START_DATE,
+        PREFERRED_PAYMENT_METHOD=PREFERRED_PAYMENT_METHOD,
+        ADDITIONAL_COMMENTS=ADDITIONAL_COMMENTS,
+        NUMBER_OF_PEOPLE=NUMBER_OF_PEOPLE,
+        TOTAL_COST=TOTAL_COST,
+        COMPANY_WEB_ADDRESS=COMPANY_WEB_ADDRESS,
+        SMTP_DEFAULT_FROM_ADDR=SMTP_DEFAULT_FROM_ADDR,
+    )
+
+    msg = EmailMessage()
+    msg.set_content(plainTextbody)  # PlainText body
+    msg.add_alternative(html, subtype="html")
+    msg["Subject"] = subject
+    msg["From"] = from_addr
+    msg["To"] = SMTP_USERNAME
     msg.add_header("Message-ID", make_msgid())
 
     s = smtplib.SMTP_SSL(host=SMTP_HOST, port=SMTP_PORT)
