@@ -16,6 +16,11 @@ import pickle
 import os
 from datetime import datetime, timezone
 from dotenv import load_dotenv
+import smtplib
+from email.message import EmailMessage
+from email.utils import make_msgid
+from jinja2 import Template
+from pathlib import Path
 
 load_dotenv(verbose=True)  # take environment variables from .env.
 
@@ -344,11 +349,6 @@ def send_booking_quote(
     booking,
     from_addr=SMTP_DEFAULT_FROM_ADDR,
 ):  # noqa: E501
-    import smtplib
-    from email.message import EmailMessage
-    from email.utils import make_msgid
-    from jinja2 import Template
-    from pathlib import Path
 
     tour = get_tour_by_tour_code(booking["tour_code"])
     costs = calculate_cost_per_person(tour, booking["number_of_people"])
@@ -432,11 +432,6 @@ def send_admin_email_booking_notification(
     booking,
     from_addr=SMTP_DEFAULT_FROM_ADDR,
 ):  # noqa: E501
-    import smtplib
-    from email.message import EmailMessage
-    from email.utils import make_msgid
-    from jinja2 import Template
-    from pathlib import Path
 
     tour = get_tour_by_tour_code(booking["tour_code"])
     costs = calculate_cost_per_person(tour, booking["number_of_people"])
