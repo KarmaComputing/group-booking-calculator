@@ -20,6 +20,7 @@
         <th scope="col">Per Person Price</th>
         <th scope="col">Total</th>
         <th scope="col">📣</th>
+        <th scope="col">Comments</th>
       </tr>
     </thead>
     <tbody>
@@ -35,7 +36,8 @@
         <td>{{ booking['alternative_tour_start_time'] }}</td>
         <td>&pound;{{ get_tour_per_person_price(booking['tour_code'], booking['number_of_people']) }}</td>
         <td>&pound;{{ get_tour_total_price(booking['tour_code'], booking['number_of_people']) }}</td>
-        <td><a href="{{ url_for('resend_booking_quote', booking_index=loop.index) }}">Resend quote</a></td>
+        <td><a href="{{ url_for('resend_booking_quote', booking_index=loop.index) }}">resend quote</a></td>
+        <td>{{ booking.get('additional_comments') }}</td>
       </tr>
     {% endfor %}
     </tbody>
